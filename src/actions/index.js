@@ -1,24 +1,20 @@
-import axios from "axios";
+import _ from "lodash";
+import jsonPlaceholder from "../apis/jsonPlaceholder";
 
-export const FETCH_POSTS = "fetch_posts";
-export const CREATE_POST = "create_post";
+export const fetchPostsAndUsers = () => async (dispatch, getState) => {
+  await dispatch(fetchPosts());
+  const userIds = _.uniq(_.map(getState().posts, "userId"));
+  userIds.forEach(id => dispatch(fetchUser(id)));
+};
 
-const ROOT_URL = "http://reduxblog.herokuapp.com/api";
-const API_KEY = "?key=DetectivePickachu9847";
+export const fetchPosts = () => async dispatch => {
+  const response = await jsonPlaceholder.get("/posts");
 
-export function fetchPosts() {
-  const request = axios.get(`${ROOT_URL}/posts${API_KEY}`);
+  dispatch({ type: "FETCH_POSTS", payload: response.data });
+};
 
-  return {
-    type: FETCH_POSTS,
-    request
-  };
-}
+export const fetchUser = id => async dispatch => {
+  const response = await jsonPlaceholder.get(`/users/${id}`);
 
-export function createPost(values) {
-  const request = axios.post(`${ROOT_URL}/posts${API_KEY}`, values);
-  return {
-    type: CREATE_POST,
-    payload: request
-  };
-}
+  dispatch({ type: "FETCH_USER", payload: response.data });
+};

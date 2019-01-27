@@ -1,25 +1,17 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import ReactDom from "react-dom";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware } from "redux";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
-import PostsIndex from "./components/posts_index";
-import PostsNew from "./components/posts_new";
-import promise from "redux-promise";
+import thunk from "redux-thunk";
 
+import App from "./components/App";
 import reducers from "./reducers";
 
-const createStoreWithMiddleware = applyMiddleware(promise)(createStore);
+const store = createStore(reducers, applyMiddleware(thunk));
 
-ReactDOM.render(
-  <Provider store={createStoreWithMiddleware(reducers)}>
-    <BrowserRouter>
-      <Switch>
-        <Route exact path="/" component={PostsIndex} />
-        <Route path="/posts/new" component={PostsNew} />
-        <Route component={() => <div>Oops,page not found!</div>} />
-      </Switch>
-    </BrowserRouter>
+ReactDom.render(
+  <Provider store={store}>
+    <App />
   </Provider>,
-  document.querySelector(".container")
+  document.querySelector("#root")
 );
